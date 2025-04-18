@@ -4,13 +4,13 @@ export const register = async (req, res, next) => {
     const { username, email, password } = req.body;
     console.log('Received values:', username, email, password);
     if (!username || !email || !password) {
-         res.status(404).json("please Give required fields")
+         res.status(209).json("please Give required fields")
     }
 
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            res.json(404).json(" this User already existed")
+            res.status(409).json(" this User already existed")
         }
         const hashedPassword = bcryptjs.hashSync(password, 10);
         const newUser = new User({
@@ -21,7 +21,7 @@ export const register = async (req, res, next) => {
         await newUser.save();
         res.json({ message: 'Signup successful' });
     } catch (error) {
-         res.status(500).error("Something went wrong")
+         res.status(500).json("Something went wrong")
     }
 };
 
@@ -34,11 +34,11 @@ export const login =async(req,res,next)=>{
     try{
         const validuser=await User.findOne({email});
         if(!validuser){
-          res.status(404).json("Invalid User");
+          res.status(209).json("Invalid User");
         }
         const validpassword=bcryptjs.compareSync(password,validuser.password);
         if(!validpassword){
-            res.status(404).json("Invalid password");
+            res.status(400).json("Invalid password");
         }
         console.log("validuser",validuser);
         const {password:pass,...rest}=validuser._doc;
